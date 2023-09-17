@@ -1,0 +1,3 @@
+[submodule "probability-app"]
+	path = probability-app
+	url = https://github.com/thakoreh/lottery-checker-fe.git
