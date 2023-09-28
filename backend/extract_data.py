@@ -70,23 +70,40 @@ async def home():
 @app.get('/check_probability/{numbers}')
 async def check_probability(numbers: str):
     user_numbers = list(map(int, numbers.split(',')))
+    print(user_numbers)
     total_draws = 0
     winning_draws = 0
+    max_percent = 0
 
     with open("scrape_data.csv", "r") as csvfile:
         reader = csv.reader(csvfile)
         next(reader)  # Skip the header
 
+
+
         for row in reader:
-            total_draws += 1
-            winning_numbers = list(map(int, row[1].split()))
+            print(row[1])
+            print(user_numbers)
 
-            if set(user_numbers) <= set(winning_numbers):
-                winning_draws += 1
+            lotter_numbers_pick = []
+            for num in row[1].split(' '):
+                try:
+                    lotter_numbers_pick.append(int(num))
+                except ValueError:
+                    continue
+            
 
-    if winning_draws > 0:
-        probability = 100
-    else:
-        probability = (winning_draws / total_draws) * 100
+            def match_percentage(l1, l2):
+                matches = set(l1) & set(l2)
+                positional_matches = sum([1 for i, j in zip(l1, l2) if i == j])
+                percentage = ((len(matches) + positional_matches) / (2 * len(set(l1)))) * 100
+                return percentage
 
-    return {'probability': probability}
+            match_percent = match_percentage(user_numbers, lotter_numbers_pick)
+            # print("Match Percentage : ", match_percent)
+            if max_percent < match_percent:
+                max_percent = match_percent
+            print("Match Percentage : ", max_percent)
+
+
+    return {'probability': max_percent}
